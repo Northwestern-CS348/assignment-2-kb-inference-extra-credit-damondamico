@@ -130,6 +130,23 @@ class KnowledgeBase(object):
         # Implementation goes here
         # Not required for the extra credit assignment
 
+    def _statement2Str(self, statement):
+        """Prints a statement as a string
+        Args:
+            statement (Statement) - Statement to be converted
+        Returns:
+            statestr (string)
+        """
+        ####################################################
+
+        statestr = "("
+        statestr += str(statement.predicate)
+        for term in statement.terms:
+            statestr += " "
+            statestr += str(term)
+        statestr += ")"
+        return statestr
+
     def kb_explain(self, fact_or_rule):
         """
         Explain where the fact or rule comes from
@@ -142,6 +159,44 @@ class KnowledgeBase(object):
         """
         ####################################################
         # Student code goes here
+        output=""
+        if (fact_or_rule in self.facts) or (fact_or_rule in self.rules):
+            assertcheck = ""
+            # if fact_or_rule.asserted:
+            #     assertcheck = " ASSERTED"
+            if isinstance(fact_or_rule,Fact):
+                output += ('fact: ' + self._statement2Str(fact_or_rule.statement) + '\n')
+            elif isinstance(fact_or_rule, Rule):
+                lhstatements = "("
+                for statement in fact_or_rule.lhs:
+                    lhstatements += self._statement2Str(statement) + ','
+                lhstatements[-1] = ')'
+                output += ('rule: ' + lhstatements + ' -> ' + self._statement2Str(fact_or_rule.rhs) + '\n')
+            output += ('  SUPPORTED BY')
+            for i in fact_or_rule.supported_by:
+                assertcheck = ""
+
+                if i.asserted:
+                    assertcheck = " ASSERTED"
+                
+                if isinstance(i, Fact):
+                    output += '    fact: ' + self._statement2Str(i.statement) + assertcheck + '\n'
+
+                elif isinstance(i, Rule):
+                    lhstatements = "("
+                    for statement in i.lhs:
+                        lhstatements += self._statement2Str(statement) + ','
+                    lhstatements[-1] = ')'
+                    output += '    rule: ' + lhstatements + ' -> ' + self._statement2Str(i.rhs) + assertcheck + '\n'
+        else:
+            if isinstance(fact_or_rule, Fact):
+                output = "Fact is not in the KB"
+            else:
+                output = 'Rule is not in the KB'
+        return output
+
+                    
+
 
 
 class InferenceEngine(object):
